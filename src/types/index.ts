@@ -7,7 +7,7 @@ export interface Character {
   name: string;
   resourceURI: string;
   thumbnail: { extension: string; path: string };
-  urls: string[];
+  urls: { type: string; url: string }[];
 }
 
 export interface CharactersResponse {

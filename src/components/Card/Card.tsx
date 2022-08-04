@@ -16,7 +16,7 @@ export const Card: React.FC<{
   const onDetails = () => onPressDetails(item.id, item.name);
 
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onDetails}>
       <Image
         source={{
           uri: imageUri,
@@ -29,9 +29,9 @@ export const Card: React.FC<{
           {item.description.length ? item.description : 'No description'}
         </Text>
       </View>
-      <TouchableOpacity style={styles.detailButton} onPress={onDetails}>
+      <View style={styles.detailButton}>
         <Text style={styles.detailButtonText}>Details &gt;</Text>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </TouchableOpacity>
   );
 };

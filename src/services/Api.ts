@@ -15,10 +15,10 @@ const apiInstance = axios.create({
 
 class Api {
   getCharacters = async ({ limit = 20, offset = 0 }) => {
-    const { data } = await apiInstance.get<AxiosResponse<CharactersResponse>>(
-      `/v1/public/characters?limit=${limit}&offset=${offset}`,
-    );
-    return { data: data.data };
+    const { data, status } = await apiInstance.get<
+      AxiosResponse<CharactersResponse>
+    >(`/v1/public/characters?limit=${limit}&offset=${offset}`);
+    return { data: data.data, error: status > 400 };
   };
 
   getDetails = async (id: number) => {

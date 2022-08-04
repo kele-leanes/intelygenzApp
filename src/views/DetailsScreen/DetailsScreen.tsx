@@ -12,9 +12,14 @@ export const DetailsScreen: React.FC<RootStackScreenProps<'Details'>> = ({
   const [character, setCharacter] = useState<Character>();
 
   const getDetails = useCallback(async () => {
-    const { data } = await api.getDetails(id);
-    setCharacter(data.results[0]);
-    setIsLoading(false);
+    try {
+      const { data } = await api.getDetails(id);
+      setCharacter(data.results[0]);
+    } catch {
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
   }, [id]);
 
   useEffect(() => {
