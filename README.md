@@ -11,7 +11,9 @@
   <a href="#dependencies">Dependencies</a> •
 </p>
 
-<Video src='' />
+<p align="center">
+<img src='https://user-images.githubusercontent.com/57466680/182824327-503ed695-68a2-4d7b-b66e-da44996c2c86.gif' />
+</p>
 
 ## Key Features
 
@@ -44,7 +46,7 @@ $ yarn ios or yarn android
 ## Summary
 
 In order to avoid errors I started writing the app in TypeScript. I used to splice the code as much as is possible to get cleaner code and more maintainable. Is the reason why I use the following folder structure
-````
+```
 component
     components.tsx
     index.ts
