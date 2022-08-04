@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, Image, Pressable } from 'react-native';
 import { Character } from 'src/types';
 import { styles } from './Card.styles';
 
@@ -16,7 +16,9 @@ export const Card: React.FC<{
   const onDetails = () => onPressDetails(item.id, item.name);
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onDetails}>
+    <Pressable
+      style={({ pressed }) => [styles.container, pressed && { opacity: 0.5 }]}
+      onPress={onDetails}>
       <Image
         source={{
           uri: imageUri,
@@ -32,6 +34,6 @@ export const Card: React.FC<{
       <View style={styles.detailButton}>
         <Text style={styles.detailButtonText}>Details &gt;</Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };

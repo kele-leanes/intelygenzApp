@@ -1,48 +1,79 @@
+import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import React, { useCallback, useState } from 'react';
 import { useEffect } from 'react';
 import { FlatList, RefreshControl, Text, View } from 'react-native';
 import { Card } from 'src/components';
 import { RootStackScreenProps } from 'src/navigation/RootStack';
 import { api } from 'src/services/Api';
-import { Character } from 'src/types';
+import { Character, CharactersResponse } from 'src/types';
 import { styles } from './HomeScreen.styles';
+
+const INITIAL_STATE = {
+  results: [],
+  offset: 20,
+  limit: 0,
+  total: 0,
+  count: 0,
+};
 
 export const HomeScreen: React.FC<RootStackScreenProps<'HomeScreen'>> = ({
   navigation,
 }) => {
-  const [characters, setCharacters] = useState<Character[]>([]);
+  const [charactersResponse, setCharactersResponse] =
+    useState<CharactersResponse>(INITIAL_STATE);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [offset, setOffset] = useState(20);
 
-  const getInitialsCharacters = async () => {
+  const { getItem, setItem } = useAsyncStorage('@CHARACTERS');
+
+  const writeItemToStorage = useCallback(
+    async (newValue: CharactersResponse) => {
+      await setItem(JSON.stringify(newValue));
+      setCharactersResponse(newValue);
+    },
+    [setItem],
+  );
+
+  const getInitialsCharacters = useCallback(async () => {
     setIsLoading(true);
     setHasError(false);
     try {
       const { data, error } = await api.getCharacters({});
       if (!error) {
-        setCharacters(data.results);
-        setOffset(data.limit);
+        writeItemToStorage(data);
         setIsLoading(false);
       }
     } catch {
+      writeItemToStorage(INITIAL_STATE);
       setHasError(true);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [writeItemToStorage]);
+
+  const readItemFromStorage = useCallback(async () => {
+    const item = await getItem();
+    if (item !== null) {
+      return setCharactersResponse(JSON.parse(item));
+    }
+    getInitialsCharacters();
+  }, [getInitialsCharacters, getItem]);
 
   const onLoadMoreCharacters = async () => {
     if (!isLoading) {
-      const { data } = await api.getCharacters({ offset });
-      setCharacters(prevState => [...prevState, ...data.results]);
-      setOffset(prevSate => prevSate + data.offset);
+      const { data } = await api.getCharacters({
+        offset: charactersResponse.results.length,
+      });
+      writeItemToStorage({
+        ...data,
+        results: [...(charactersResponse?.results ?? []), ...data.results],
+      });
     }
   };
 
   useEffect(() => {
-    getInitialsCharacters();
-  }, []);
+    readItemFromStorage();
+  }, [readItemFromStorage]);
 
   const handlePressDetails = useCallback(
     (id: number, name: string) => {
@@ -73,7 +104,7 @@ export const HomeScreen: React.FC<RootStackScreenProps<'HomeScreen'>> = ({
     <FlatList
       style={styles.flex1}
       contentContainerStyle={styles.container}
-      data={characters}
+      data={charactersResponse?.results}
       renderItem={renderItem}
       ListEmptyComponent={ListEmptyComponent}
       onEndReached={onLoadMoreCharacters}
